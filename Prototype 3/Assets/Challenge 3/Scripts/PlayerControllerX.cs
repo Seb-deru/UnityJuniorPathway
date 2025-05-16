@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class PlayerControllerX : MonoBehaviour
 {
-    public bool gameOver;
-
-    public float floatForce;
-    private float gravityModifier = 1.5f;
     private Rigidbody playerRb;
-
+    private AudioSource playerAudio;
+    private float gravityModifier = 1.5f;
+    private float topBound = 15;
+    private bool isOnGround = false;
+    
+    public bool gameOver;
+    public float floatForce;
     public ParticleSystem explosionParticle;
     public ParticleSystem fireworksParticle;
-
-    private AudioSource playerAudio;
     public AudioClip moneySound;
     public AudioClip explodeSound;
+    public AudioClip bounceSound;
 
 
     // Start is called before the first frame update
@@ -23,6 +24,7 @@ public class PlayerControllerX : MonoBehaviour
     {
         Physics.gravity *= gravityModifier;
         playerAudio = GetComponent<AudioSource>();
+        playerRb= GetComponent<Rigidbody>();
 
         // Apply a small upward force at the start of the game
         playerRb.AddForce(Vector3.up * 5, ForceMode.Impulse);
@@ -32,10 +34,19 @@ public class PlayerControllerX : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isOnGround && !gameOver)
+        {
+            playerRb.AddForce(Vector3.up * floatForce, ForceMode.Impulse);
+            isOnGround = false;
+        }
         // While space is pressed and player is low enough, float up
-        if (Input.GetKey(KeyCode.Space) && !gameOver)
+        if (Input.GetKey(KeyCode.Space) && !gameOver && transform.position.y < topBound)
         {
             playerRb.AddForce(Vector3.up * floatForce);
+        }
+        if (transform.position.y > topBound && playerRb.linearVelocity.y > 0)
+        { 
+            playerRb.AddForce(Vector3.down * playerRb.linearVelocity.y); 
         }
     }
 
@@ -58,8 +69,12 @@ public class PlayerControllerX : MonoBehaviour
             playerAudio.PlayOneShot(moneySound, 1.0f);
             Destroy(other.gameObject);
 
+        } 
+        else if (other.gameObject.CompareTag("Ground"))
+        {
+            isOnGround = true;
+            playerAudio.PlayOneShot(bounceSound);
         }
-
     }
 
 }
