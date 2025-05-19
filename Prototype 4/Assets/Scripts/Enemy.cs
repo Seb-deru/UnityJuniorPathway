@@ -1,3 +1,4 @@
+using TreeEditor;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -18,6 +19,11 @@ public class Enemy : MonoBehaviour
         Vector3 lookDirection = GetLookDirection();
 
         enemyRb.AddForce(lookDirection * speed);
+
+        if(transform.position.y < -10)
+        {
+            Destroy(gameObject);
+        }
     }
 
     private Vector3 GetLookDirection()
