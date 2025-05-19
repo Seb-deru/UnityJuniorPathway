@@ -51,7 +51,9 @@ public class SpawnManagerX : MonoBehaviour
         // Spawn number of enemy balls based on wave number
         for (int i = 0; i < enemiesToSpawn; i++)
         {
-            Instantiate(enemyPrefab, GenerateSpawnPosition(), enemyPrefab.transform.rotation);
+            GameObject enemy = Instantiate(enemyPrefab, GenerateSpawnPosition(), enemyPrefab.transform.rotation);
+            EnemyX enemyXScript = enemy.GetComponent<EnemyX>();
+            enemyXScript.speed += waveCount * 10; // Increase speed by 5 for each wave
         }
 
         waveCount++;
